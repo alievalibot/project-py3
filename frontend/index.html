@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Recipes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>AI Recipe Generator</h1>
+
+    <div class="card">
+        <label>Vegetarian?</label>
+        <select id="vegetarian">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+
+        <label>Ingredients (comma separated)</label>
+        <textarea id="ingredients"></textarea>
+
+        <button onclick="generateRecipes()">Generate</button>
+    </div>
+
+    <div id="result"></div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
