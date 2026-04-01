@@ -4,3 +4,4 @@ sqlalchemy
 python-dotenv
 google-genai
 jinja2
+psycopg2-binary
