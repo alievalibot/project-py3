@@ -1,6 +1,7 @@
 import os
 import json
-from google import genai
+import app.models
+import app.models as models
 from fastapi import FastAPI
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -10,6 +11,7 @@ from app import schemas
 from typing import Optional
 from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from google import genai
 
 Base.metadata.create_all(bind=engine)
 
@@ -156,6 +158,14 @@ def generate_ai_recipes(data: schemas.AIRecipeRequest):
     vegetarian_text = "vegetarian" if data.is_vegetarian else "not necessarily vegetarian"
     ingredients_text = ", ".join(data.ingredients)
 
+    with Session(engine) as session:
+        new_request = models.GenerationRequest(
+            is_vegetarian=data.is_vegetarian,
+            ingredients=ingredients_text
+        )
+        session.add(new_request)
+        session.commit()
+
     prompt = f"""
 You are a cooking assistant.
 
@@ -217,3 +227,19 @@ Rules:
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+    
+@app.get("/history")
+def get_history():
+    with Session(engine) as session:
+        requests = session.query(models.GenerationRequest).order_by(models.GenerationRequest.created_at.desc()).all()
+
+        return [
+            {
+                "id": request.id,
+                "is_vegetarian": request.is_vegetarian,
+                "ingredients": request.ingredients,
+                "created_at": request.created_at
+            }
+            for request in requests
+        ]
